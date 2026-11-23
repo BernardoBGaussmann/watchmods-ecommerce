@@ -1,13 +1,35 @@
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { watches, formatPrice } from '../data/watches';
 
 /**
  * WatchDetails - Página de detalhes do relógio
  * Lê o ID da URL via useParams e busca o relógio no array watches
+ * @param {Object} props - Props do componente
+ * @param {Function} props.onAddToCart - Função para adicionar item ao carrinho
  */
-function WatchDetails() {
+function WatchDetails({ onAddToCart }) {
   const { id } = useParams();
+  const navigate = useNavigate();
   const watch = watches.find((w) => w.id === id);
+
+  // Estado local para feedback visual do botão "Adicionar ao Carrinho"
+  const [addedFeedback, setAddedFeedback] = useState(false);
+
+  // Handler para "Adicionar ao Carrinho"
+  const handleAddToCart = () => {
+    if (!watch.inStock) return;
+    onAddToCart(watch);
+    setAddedFeedback(true);
+    setTimeout(() => setAddedFeedback(false), 1500);
+  };
+
+  // Handler para "Comprar Agora"
+  const handleBuyNow = () => {
+    if (!watch.inStock) return;
+    onAddToCart(watch);
+    navigate('/carrinho');
+  };
 
   // Relógio não encontrado
   if (!watch) {
@@ -147,6 +169,7 @@ function WatchDetails() {
             <div className="space-y-4 border-t border-gray-200 dark:border-gray-700 pt-6">
               {/* Botão principal: Comprar Agora */}
               <button
+                onClick={handleBuyNow}
                 className={`w-full py-4 px-6 text-lg font-semibold rounded-xl transition-all ${
                   watch.inStock
                     ? 'bg-purple-600 text-white hover:bg-purple-700 focus:ring-4 focus:ring-purple-500/30'
@@ -160,6 +183,7 @@ function WatchDetails() {
 
               {/* Botão secundário: Adicionar ao Carrinho */}
               <button
+                onClick={handleAddToCart}
                 className={`w-full py-4 px-6 text-lg font-semibold rounded-xl transition-all ${
                   watch.inStock
                     ? 'border-2 border-purple-600 text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 focus:ring-4 focus:ring-purple-500/30'
@@ -168,7 +192,7 @@ function WatchDetails() {
                 disabled={!watch.inStock}
                 aria-label={watch.inStock ? `Adicionar ${watch.name} ao carrinho` : `${watch.name} fora de estoque`}
               >
-                {watch.inStock ? 'Adicionar ao Carrinho' : 'Indisponível'}
+                {addedFeedback ? 'Adicionado!' : watch.inStock ? 'Adicionar ao Carrinho' : 'Indisponível'}
               </button>
 
               {/* Trust badges */}
