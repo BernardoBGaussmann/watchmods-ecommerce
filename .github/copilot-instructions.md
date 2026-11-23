@@ -23,3 +23,23 @@
 - When asked to commit, create small, atomic commits separated by concern.
 - Use **English Conventional Commits** (`chore:`, `feat:`, `fix:`, `docs:`, `style:`, `refactor:`).
 - **NEVER** include AI co-author trailers (`Co-authored-by:`) or mention AI tools in commit messages.
+
+## 5. Code Quality & Maintainability (CRITICAL)
+- **Readable Code with Portuguese Comments:** All functions, components, and complex logic must have clear comments in Portuguese explaining what the code does, its purpose, and any important details.
+- **Modular Architecture:** Code must be organized into small, focused, reusable modules/components. Each file should have a single responsibility.
+- **Easy Maintainability:** 
+  - Use descriptive variable and function names in English
+  - Keep functions small and focused (single responsibility)
+  - Avoid code duplication (DRY principle)
+  - Use consistent code style and formatting
+  - Separate concerns: UI components, business logic, data, and utilities in separate files/folders
+  - Export only what's necessary (named exports preferred)
+  - Document complex algorithms or business rules with inline comments in Portuguese
+
+## 6. Commit Rules (CRITICAL)
+- **Generate commit prompt for EVERY change**, no matter how small (font change, color change, logic change, typo fix, etc.)
+- Follow **English Conventional Commits** format: `type(scope): description`
+- Types: `feat`, `fix`, `chore`, `docs`, `style`, `refactor`, `perf`, `test`
+- **Atomic commits** - each commit should contain only one logical change
+- Provide the exact `git commit` command for the user to run
+- **NEVER run `git commit` automatically** - only provide the prompt/command
