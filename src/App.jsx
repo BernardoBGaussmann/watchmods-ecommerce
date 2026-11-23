@@ -25,11 +25,24 @@ function ScrollToTop() {
  * App - Componente raiz da aplicação WatchModsBR
  * Inclui Header, Hero, área principal de conteúdo e Footer
  * Configura rotas com react-router-dom
- * Gerencia estado do carrinho de compras
+ * Gerencia estado do carrinho de compras (persistido no localStorage)
  */
 function App() {
   // Estado do carrinho: array de itens { ...watch, quantity }
-  const [cart, setCart] = useState([]);
+  // Inicializa lendo do localStorage (lazy initializer)
+  const [cart, setCart] = useState(() => {
+    try {
+      const stored = localStorage.getItem('watchmodsbr_cart');
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  // Persiste carrinho no localStorage a cada mudança
+  useEffect(() => {
+    localStorage.setItem('watchmodsbr_cart', JSON.stringify(cart));
+  }, [cart]);
 
   // Adiciona relógio ao carrinho ou incrementa quantidade
   const addToCart = (watch) => {
