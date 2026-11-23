@@ -1,5 +1,4 @@
-import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { formatPrice } from '../data/watches';
 
 /**
@@ -8,21 +7,17 @@ import { formatPrice } from '../data/watches';
  * @param {Array} props.cart - Array de itens no carrinho
  * @param {Function} props.onUpdateQuantity - Função para atualizar quantidade (id, amount)
  * @param {Function} props.onRemoveItem - Função para remover item (id)
- * @param {Function} props.onClearCart - Função para limpar carrinho
  * @returns {JSX.Element} Página do carrinho
  */
-function Cart({ cart, onUpdateQuantity, onRemoveItem, onClearCart }) {
-  // Estado local para mensagem de sucesso
-  const [showSuccess, setShowSuccess] = useState(false);
+function Cart({ cart, onUpdateQuantity, onRemoveItem }) {
+  const navigate = useNavigate();
 
   // Calcula subtotal
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-  // Handler para finalizar pedido
+  // Handler para finalizar pedido - navega para checkout
   const handleCheckout = () => {
-    onClearCart();
-    setShowSuccess(true);
-    setTimeout(() => setShowSuccess(false), 3000);
+    navigate('/checkout');
   };
 
   // Carrinho vazio
@@ -30,9 +25,7 @@ function Cart({ cart, onUpdateQuantity, onRemoveItem, onClearCart }) {
     return (
       <section className="min-h-screen bg-white dark:bg-gray-900 py-16 px-6 flex items-center justify-center">
         <div className="text-center max-w-md">
-          <svg className="w-20 h-20 mx-auto text-gray-300 dark:text-gray-600 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a2 2 0 00-2-2H5a2 2 0 00-2 2v7a2 2 0 002 2h2m4 0h10a2 2 0 002-2v-7a2 2 0 00-2-2H9a2 2 0 00-2 2v7a2 2 0 002 2h2m7-7a2 2 0 114 0 2 2 0 01-4 0z" />
-          </svg>
+          <p className="text-6xl mb-4">🛒</p>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
             Seu carrinho está vazio
           </h1>
@@ -43,10 +36,7 @@ function Cart({ cart, onUpdateQuantity, onRemoveItem, onClearCart }) {
             to="/"
             className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition-colors"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Voltar para a vitrine
+            ← Voltar para a vitrine
           </Link>
         </div>
       </section>
@@ -62,26 +52,13 @@ function Cart({ cart, onUpdateQuantity, onRemoveItem, onClearCart }) {
           to="/"
           className="inline-flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors mb-8"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
-          Voltar para a vitrine
+          ← Voltar para a vitrine
         </Link>
 
         {/* Título */}
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">
           Carrinho de Compras
         </h1>
-
-        {/* Mensagem de sucesso */}
-        {showSuccess && (
-          <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg flex items-center gap-3">
-            <svg className="w-6 h-6 text-green-600 dark:text-green-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <p className="text-green-800 dark:text-green-300 font-medium">Pedido realizado com sucesso!</p>
-          </div>
-        )}
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Lista de itens - 2/3 da largura */}

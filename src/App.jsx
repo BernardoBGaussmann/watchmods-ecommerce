@@ -7,6 +7,7 @@ import WatchGrid from './components/WatchGrid';
 import WatchDetails from './pages/WatchDetails';
 import Cart from './pages/Cart';
 import Watches from './pages/Watches';
+import Checkout from './pages/Checkout';
 
 /**
  * ScrollToTop - Componente que rola para o topo a cada mudança de rota
@@ -123,7 +124,9 @@ function App() {
             {/* Rota detalhes do relógio - recebe função addToCart */}
             <Route path="/relogio/:id" element={<WatchDetails onAddToCart={addToCart} />} />
             {/* Rota carrinho - recebe cart e funções de gerenciamento */}
-            <Route path="/carrinho" element={<Cart cart={cart} onUpdateQuantity={updateQuantity} onRemoveItem={removeFromCart} onClearCart={clearCart} />} />
+            <Route path="/carrinho" element={<Cart cart={cart} onUpdateQuantity={updateQuantity} onRemoveItem={removeFromCart} />} />
+            {/* Rota checkout - recebe cart e função para limpar após pedido */}
+            <Route path="/checkout" element={<Checkout cart={cart} onClearCart={clearCart} />} />
           </Routes>
         </main>
         
