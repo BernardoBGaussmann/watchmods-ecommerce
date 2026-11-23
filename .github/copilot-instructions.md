@@ -45,5 +45,5 @@
 - **NEVER run `git commit` automatically** - only provide the prompt/command
 
 ## 7. Dev Server & Terminal Rules
-- **NEVER start, stop, or restart the dev server (`npm run dev`).** The user manages the Vite server manually in their own terminal.
-- Never run `curl` or web fetch tools against `localhost` to check CSS or rendering.
+- **NEVER start, stop, restart, or inspect the dev server.** Do NOT run `npm run dev`, `lsof`, `ps`, `pkill`, `curl`, or web fetch tools against `localhost`.
+- The user manages and verifies the running app manually in their own browser.

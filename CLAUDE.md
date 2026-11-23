@@ -43,3 +43,7 @@
 - **Atomic commits** - each commit should contain only one logical change
 - Provide the exact `git commit` command for the user to run
 - **NEVER run `git commit` automatically** - only provide the prompt/command
+
+## 7. Dev Server & Terminal Rules
+- **NEVER start, stop, restart, or inspect the dev server.** Do NOT run `npm run dev`, `lsof`, `ps`, `pkill`, `curl`, or web fetch tools against `localhost`.
+- The user manages and verifies the running app manually in their own browser.
