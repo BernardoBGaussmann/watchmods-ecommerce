@@ -57,22 +57,14 @@ function WatchCard({ watch }) {
           <span>{watch.caseSize}</span>
         </div>
 
-        {/* Preço formatado BRL */}
+        {/* Preço formatado BRL + botão Ver Detalhes */}
         <div className="pt-2 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
           <span className="text-lg font-bold text-gray-900 dark:text-white">
             {formatPrice(watch.price)}
           </span>
-          <button
-            className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
-              watch.inStock
-                ? 'bg-purple-600 text-white hover:bg-purple-700'
-                : 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
-            }`}
-            disabled={!watch.inStock}
-            aria-label={watch.inStock ? `Adicionar ${watch.name} ao carrinho` : `${watch.name} fora de estoque`}
-          >
-            {watch.inStock ? 'Adicionar' : 'Indisponível'}
-          </button>
+          <span className="px-3 py-1.5 text-sm font-medium text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors">
+            Ver Detalhes
+          </span>
         </div>
       </div>
     </article>
