@@ -1,9 +1,10 @@
 import Header from './components/Header';
 import Footer from './components/Footer';
+import Hero from './components/Hero';
 
 /**
  * App - Componente raiz da aplicação WatchModsBR
- * Inclui Header, área principal de conteúdo e Footer
+ * Inclui Header, Hero, área principal de conteúdo e Footer
  */
 function App() {
   return (
@@ -13,6 +14,10 @@ function App() {
       
       {/* Área principal de conteúdo - flex-1 empurra footer para baixo */}
       <main className="flex-1 pt-16">
+        {/* Hero Section */}
+        <Hero />
+        
+        {/* Conteúdo adicional */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center">
             <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-4">
