@@ -4,6 +4,7 @@
  * Recebe prop `watch` com: id, name, caseSize, price, imageUrl, inStock, featured
  */
 import { formatPrice } from "../data/watches";
+import { Link } from 'react-router-dom';
 
 /**
  * WatchCard - Card de relógio
@@ -13,7 +14,8 @@ import { formatPrice } from "../data/watches";
  */
 function WatchCard({ watch }) {
   return (
-    <article className="group bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-300 hover:shadow-lg">
+    <Link to={`/relogio/${watch.id}`} className="block">
+      <article className="group bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-300 hover:shadow-lg">
       {/* Imagem do relógio - aspect-square object-cover */}
       <div className="aspect-square relative bg-gray-100 dark:bg-gray-900 overflow-hidden">
         <img
@@ -74,6 +76,7 @@ function WatchCard({ watch }) {
         </div>
       </div>
     </article>
+    </Link>
   );
 }
 
