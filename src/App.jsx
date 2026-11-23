@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Hero from './components/Hero';
@@ -23,14 +23,36 @@ function ScrollToTop() {
  * App - Componente raiz da aplicação WatchModsBR
  * Inclui Header, Hero, área principal de conteúdo e Footer
  * Configura rotas com react-router-dom
+ * Gerencia estado do carrinho de compras
  */
 function App() {
+  // Estado do carrinho: array de itens { ...watch, quantity }
+  const [cart, setCart] = useState([]);
+
+  // Adiciona relógio ao carrinho ou incrementa quantidade
+  const addToCart = (watch) => {
+    setCart((prevCart) => {
+      const existingIndex = prevCart.findIndex((item) => item.id === watch.id);
+      if (existingIndex >= 0) {
+        // Já existe: incrementa quantity
+        const updated = [...prevCart];
+        updated[existingIndex] = { ...updated[existingIndex], quantity: updated[existingIndex].quantity + 1 };
+        return updated;
+      }
+      // Novo item: adiciona com quantity 1
+      return [...prevCart, { ...watch, quantity: 1 }];
+    });
+  };
+
+  // Total de itens no carrinho (soma das quantidades)
+  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+
   return (
     <BrowserRouter>
       <ScrollToTop />
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col">
-        {/* Header fixo */}
-        <Header />
+        {/* Header fixo - recebe contador do carrinho */}
+        <Header cartCount={cartCount} />
         
         {/* Área principal de conteúdo - flex-1 empurra footer para baixo */}
         <main className="flex-1 pt-16">
@@ -53,8 +75,8 @@ function App() {
                 </div>
               </>
             } />
-            {/* Rota detalhes do relógio */}
-            <Route path="/relogio/:id" element={<WatchDetails />} />
+            {/* Rota detalhes do relógio - recebe função addToCart */}
+            <Route path="/relogio/:id" element={<WatchDetails onAddToCart={addToCart} />} />
           </Routes>
         </main>
         
