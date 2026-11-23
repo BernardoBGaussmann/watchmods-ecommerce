@@ -11,7 +11,7 @@ export const watches = [
     id: '550e8400-e29b-41d4-a716-446655440001',
     name: 'Submariner Custom',
     caseSize: '42mm',
-    price: 1250000,
+    price: 12500,
     imageUrl: placeholderImage,
     inStock: true,
     featured: true
@@ -20,7 +20,7 @@ export const watches = [
     id: '550e8400-e29b-41d4-a716-446655440002',
     name: 'GMT Master II Mod',
     caseSize: '40mm',
-    price: 1480000,
+    price: 14800,
     imageUrl: placeholderImage,
     inStock: true,
     featured: true
@@ -29,7 +29,16 @@ export const watches = [
     id: '550e8400-e29b-41d4-a716-446655440003',
     name: 'Daytona Ceramic',
     caseSize: '41mm',
-    price: 1890000,
+    price: 18900,
+    imageUrl: placeholderImage,
+    inStock: false,
+    featured: true
+  },
+   {
+    id: '550e8400-e29b-41d4-a716-446655440004',
+    name: 'Daytona Ceramic',
+    caseSize: '41mm',
+    price: 18900,
     imageUrl: placeholderImage,
     inStock: false,
     featured: true
