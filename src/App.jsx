@@ -5,6 +5,7 @@ import Footer from './components/Footer';
 import Hero from './components/Hero';
 import WatchGrid from './components/WatchGrid';
 import WatchDetails from './pages/WatchDetails';
+import Cart from './pages/Cart';
 
 /**
  * ScrollToTop - Componente que rola para o topo a cada mudança de rota
@@ -44,6 +45,34 @@ function App() {
     });
   };
 
+  // Atualiza quantidade do item (+1 ou -1), remove se chegar a 0
+  const updateQuantity = (id, amount) => {
+    setCart((prevCart) => {
+      const existingIndex = prevCart.findIndex((item) => item.id === id);
+      if (existingIndex < 0) return prevCart;
+      
+      const newQuantity = prevCart[existingIndex].quantity + amount;
+      if (newQuantity <= 0) {
+        // Remove item se quantidade <= 0
+        return prevCart.filter((item) => item.id !== id);
+      }
+      // Atualiza quantidade
+      const updated = [...prevCart];
+      updated[existingIndex] = { ...updated[existingIndex], quantity: newQuantity };
+      return updated;
+    });
+  };
+
+  // Remove item do carrinho
+  const removeFromCart = (id) => {
+    setCart((prevCart) => prevCart.filter((item) => item.id !== id));
+  };
+
+  // Limpa carrinho completamente
+  const clearCart = () => {
+    setCart([]);
+  };
+
   // Total de itens no carrinho (soma das quantidades)
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -77,6 +106,8 @@ function App() {
             } />
             {/* Rota detalhes do relógio - recebe função addToCart */}
             <Route path="/relogio/:id" element={<WatchDetails onAddToCart={addToCart} />} />
+            {/* Rota carrinho - recebe cart e funções de gerenciamento */}
+            <Route path="/carrinho" element={<Cart cart={cart} onUpdateQuantity={updateQuantity} onRemoveItem={removeFromCart} onClearCart={clearCart} />} />
           </Routes>
         </main>
         
