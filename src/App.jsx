@@ -1,7 +1,7 @@
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Hero from './components/Hero';
-
+import WatchGrid from './components/WatchGrid';
 /**
  * App - Componente raiz da aplicação WatchModsBR
  * Inclui Header, Hero, área principal de conteúdo e Footer
@@ -16,7 +16,7 @@ function App() {
       <main className="flex-1 pt-16">
         {/* Hero Section */}
         <Hero />
-        
+        <WatchGrid />
         {/* Conteúdo adicional */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center">
