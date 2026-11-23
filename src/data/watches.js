@@ -42,6 +42,24 @@ export const watches = [
     imageUrl: placeholderImage,
     inStock: false,
     featured: true
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440005',
+    name: 'Daytona Ceramic',
+    caseSize: '41mm',
+    price: 18900,
+    imageUrl: placeholderImage,
+    inStock: false,
+    featured: true
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440006',
+    name: 'Daytona Ceramic',
+    caseSize: '41mm',
+    price: 18900,
+    imageUrl: placeholderImage,
+    inStock: false,
+    featured: true
   }
 ];
 
