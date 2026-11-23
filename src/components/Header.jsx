@@ -4,14 +4,16 @@
  */
 
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 /**
  * Header - Cabeçalho fixo horizontal com toggle de tema
+ * @param {Object} props - Props do componente
+ * @param {number} props.cartCount - Quantidade total de itens no carrinho
  * @returns {JSX.Element} Header com logo esquerda, nav centro, ações direita
  */
-function Header() {
+function Header({ cartCount = 0 }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [cartCount, setCartCount] = useState(0);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   // Inicializa tema do localStorage ou preferência do sistema
@@ -41,24 +43,24 @@ function Header() {
         <div className="flex items-center justify-between h-16 w-full">
           
           {/* Logo - Esquerda */}
-          <a 
-            href="/" 
+          <Link 
+            to="/" 
             className="text-2xl font-bold tracking-wider text-gray-900 dark:text-white hover:text-purple-600 dark:hover:text-purple-400 transition-colors shrink-0"
             aria-label="WatchModsBR - Página inicial"
           >
             WATCHMODSBR
-          </a>
+          </Link>
 
           {/* Navegação - Centro (Desktop) */}
           <div className="hidden md:flex md:items-center md:gap-6 flex-1 justify-center">
-            <a href="/" className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors" onClick={closeMobileMenu}>Início</a>
-            <a href="/relogios" className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors" onClick={closeMobileMenu}>Relógios</a>
-            <a href="/destaques" className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors" onClick={closeMobileMenu}>Destaques</a>
+            <Link to="/" className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors" onClick={closeMobileMenu}>Início</Link>
+            <Link to="/relogios" className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors" onClick={closeMobileMenu}>Relógios</Link>
+            <Link to="/destaques" className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors" onClick={closeMobileMenu}>Destaques</Link>
           </div>
 
           {/* Ações - Direita (Desktop) */}
           <div className="hidden md:flex md:items-center md:gap-4 shrink-0">
-            <a href="/login" className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">Entrar</a>
+            <Link to="/login" className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">Entrar</Link>
             
             {/* Toggle Tema - Sol/Lua */}
             <button
@@ -81,7 +83,7 @@ function Header() {
             </button>
             
             {/* Carrinho - SVG com tamanho fixo */}
-            <a href="/carrinho" className="relative text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" aria-label={`Carrinho${cartCount > 0 ? ` (${cartCount})` : ''}`}>
+            <Link to="/carrinho" className="relative text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" aria-label={`Carrinho${cartCount > 0 ? ` (${cartCount})` : ''}`}>
               <svg className="w-6 h-6 shrink-0" width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a2 2 0 00-2-2H5a2 2 0 00-2 2v7a2 2 0 002 2h2m4 0h10a2 2 0 002-2v-7a2 2 0 00-2-2H9a2 2 0 00-2 2v7a2 2 0 002 2h2m7-7a2 2 0 114 0 2 2 0 01-4 0z" />
               </svg>
@@ -90,7 +92,7 @@ function Header() {
                   {cartCount > 9 ? '9+' : cartCount}
                 </span>
               )}
-            </a>
+            </Link>
           </div>
 
           {/* Mobile Hamburger */}
@@ -102,14 +104,14 @@ function Header() {
         {/* Mobile Menu */}
         <div id="mobile-menu" className={`md:hidden transition-all duration-300 overflow-hidden ${isMobileMenuOpen ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'}`} role="navigation">
           <div className="py-4 space-y-2 border-t border-gray-200 dark:border-gray-700">
-            <a href="/" className="block px-2 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg" onClick={closeMobileMenu}>Início</a>
-            <a href="/relogios" className="block px-2 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg" onClick={closeMobileMenu}>Relógios</a>
-            <a href="/destaques" className="block px-2 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg" onClick={closeMobileMenu}>Destaques</a>
+            <Link to="/" className="block px-2 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg" onClick={closeMobileMenu}>Início</Link>
+            <Link to="/relogios" className="block px-2 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg" onClick={closeMobileMenu}>Relógios</Link>
+            <Link to="/destaques" className="block px-2 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg" onClick={closeMobileMenu}>Destaques</Link>
             <hr className="my-3 border-gray-200 dark:border-gray-700" />
-            <a href="/login" className="block px-2 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg" onClick={closeMobileMenu}>Entrar</a>
-            <a href="/carrinho" className="block px-2 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg flex items-center justify-between" onClick={closeMobileMenu}>
+            <Link to="/login" className="block px-2 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg" onClick={closeMobileMenu}>Entrar</Link>
+            <Link to="/carrinho" className="block px-2 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg flex items-center justify-between" onClick={closeMobileMenu}>
               Carrinho {cartCount > 0 && <span className="bg-purple-600 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">{cartCount > 9 ? '9+' : cartCount}</span>}
-            </a>
+            </Link>
             {/* Toggle tema no mobile menu */}
             <hr className="my-3 border-gray-200 dark:border-gray-700" />
             <button
