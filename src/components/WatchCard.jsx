@@ -4,8 +4,6 @@
  * Recebe prop `watch` com: id, name, caseSize, price, imageUrl, inStock, featured
  */
 
-import { formatPrice } from '../data/watches';
-
 /**
  * WatchCard - Card de relógio
  * @param {Object} props - Props do componente
@@ -59,7 +57,7 @@ function WatchCard({ watch }) {
         {/* Preço formatado BRL */}
         <div className="pt-2 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
           <span className="text-lg font-bold text-gray-900 dark:text-white">
-            {formatPrice(watch.price)}
+            {watch.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
           </span>
           <button
             className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
