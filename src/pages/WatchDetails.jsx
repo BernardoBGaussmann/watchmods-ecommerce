@@ -97,6 +97,21 @@ function WatchDetails() {
                 </div>
               </div>
 
+              {/* Movimento */}
+              <div className="flex items-center gap-3 border-t border-gray-200 dark:border-gray-700 pt-4">
+                <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
+                  <svg className="w-6 h-6 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Movimento</p>
+                  <p className="text-xl font-semibold text-gray-900 dark:text-white">
+                    {watch.movement || 'Mecânico Automático'}
+                  </p>
+                </div>
+              </div>
+
               {/* Preço */}
               <div className="flex items-center gap-3 border-t border-gray-200 dark:border-gray-700 pt-4">
                 <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
@@ -128,13 +143,27 @@ function WatchDetails() {
               </div>
             </div>
 
-            {/* Botão Adicionar ao Carrinho + Trust badges */}
+            {/* Botões de ação + Trust badges */}
             <div className="space-y-4 border-t border-gray-200 dark:border-gray-700 pt-6">
+              {/* Botão principal: Comprar Agora */}
               <button
                 className={`w-full py-4 px-6 text-lg font-semibold rounded-xl transition-all ${
                   watch.inStock
                     ? 'bg-purple-600 text-white hover:bg-purple-700 focus:ring-4 focus:ring-purple-500/30'
                     : 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+                }`}
+                disabled={!watch.inStock}
+                aria-label={watch.inStock ? `Comprar ${watch.name} agora` : `${watch.name} fora de estoque`}
+              >
+                {watch.inStock ? 'Comprar Agora' : 'Indisponível'}
+              </button>
+
+              {/* Botão secundário: Adicionar ao Carrinho */}
+              <button
+                className={`w-full py-4 px-6 text-lg font-semibold rounded-xl transition-all ${
+                  watch.inStock
+                    ? 'border-2 border-purple-600 text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 focus:ring-4 focus:ring-purple-500/30'
+                    : 'border-2 border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed'
                 }`}
                 disabled={!watch.inStock}
                 aria-label={watch.inStock ? `Adicionar ${watch.name} ao carrinho` : `${watch.name} fora de estoque`}
