@@ -43,3 +43,7 @@
 - **Atomic commits** - each commit should contain only one logical change
 - Provide the exact `git commit` command for the user to run
 - **NEVER run `git commit` automatically** - only provide the prompt/command
+
+## 7. Dev Server & Terminal Rules
+- **NEVER start, stop, or restart the dev server (`npm run dev`).** The user manages the Vite server manually in their own terminal.
+- Never run `curl` or web fetch tools against `localhost` to check CSS or rendering.
