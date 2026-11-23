@@ -1,9 +1,23 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Hero from './components/Hero';
 import WatchGrid from './components/WatchGrid';
 import WatchDetails from './pages/WatchDetails';
+
+/**
+ * ScrollToTop - Componente que rola para o topo a cada mudança de rota
+ */
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  
+  return null;
+}
 
 /**
  * App - Componente raiz da aplicação WatchModsBR
@@ -13,6 +27,7 @@ import WatchDetails from './pages/WatchDetails';
 function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col">
         {/* Header fixo */}
         <Header />
