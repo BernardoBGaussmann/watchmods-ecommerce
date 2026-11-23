@@ -35,3 +35,15 @@ export const watches = [
     featured: true
   }
 ];
+
+/**
+ * Formata preço de centavos para string BRL
+ * @param {number} price - Preço em centavos
+ * @returns {string} Preço formatado (ex: "R$ 12.500,00")
+ */
+export function formatPrice(price) {
+  return price.toLocaleString('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  });
+}
