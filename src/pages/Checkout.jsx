@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { formatPrice } from '../data/watches';
+import { formatPrice, calculateInstallments } from '../data/watches';
 
 /**
  * Checkout - Página de finalização de pedido
@@ -29,7 +29,17 @@ function Checkout({ cart, onClearCart }) {
   const errorClass = 'border-red-500';
   const normalClass = 'border-gray-300 dark:border-gray-600';
 
-  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  // Calcula preço do item considerando parcelamento
+  const getItemPrice = (item) => {
+    if (item.installments) {
+      const options = calculateInstallments(item.price);
+      const opt = options.find((o) => o.installments === item.installments);
+      return opt ? opt.totalAmount : item.price;
+    }
+    return item.price;
+  };
+
+  const total = cart.reduce((sum, item) => sum + getItemPrice(item) * item.quantity, 0);
 
   // Busca CEP via ViaCEP
   const fetchCep = async (cepValue) => {
@@ -231,8 +241,11 @@ function Checkout({ cart, onClearCart }) {
                     <img src={item.imageUrl} alt={item.name} className="w-16 h-16 object-cover rounded-lg" />
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-gray-900 dark:text-white truncate">{item.name}</p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">Qtd: {item.quantity} × {formatPrice(item.price)}</p>
-                      <p className="font-medium text-gray-900 dark:text-white">{formatPrice(item.price * item.quantity)}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        Qtd: {item.quantity} × {formatPrice(getItemPrice(item))}
+                        {item.installments && <span className="ml-1 text-purple-600 dark:text-purple-400">({item.installments}x)</span>}
+                      </p>
+                      <p className="font-medium text-gray-900 dark:text-white">{formatPrice(getItemPrice(item) * item.quantity)}</p>
                     </div>
                   </div>
                 ))}
