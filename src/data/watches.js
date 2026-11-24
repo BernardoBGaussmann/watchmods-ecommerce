@@ -74,3 +74,41 @@ export function formatPrice(price) {
     currency: 'BRL',
   });
 }
+
+/**
+ * Tabela fixa de taxas de parcelamento
+ * Percentual total de acréscimo sobre o valor Pix para cada número de parcelas
+ */
+export const INSTALLMENT_RATES = {
+  1: 3.16,
+  2: 4.51,
+  3: 5.29,
+  4: 6.07,
+  5: 6.85,
+  6: 7.63,
+  7: 8.41,
+  8: 9.20,
+  9: 9.98,
+  10: 10.76,
+  11: 11.54,
+  12: 12.32,
+};
+
+/**
+ * Calcula as 12 opções de parcelamento para um preço base
+ * @param {number} pixPrice - Preço base (Pix) do produto
+ * @returns {Array<{installments: number, totalAmount: number, installmentAmount: number}>}
+ *   Array de 1x a 12x com total e valor de cada parcela
+ */
+export function calculateInstallments(pixPrice) {
+  return Object.entries(INSTALLMENT_RATES).map(([installments, rate]) => {
+    const totalAmount = Math.round(pixPrice * (1 + rate / 100));
+    const count = Number(installments);
+
+    return {
+      installments: count,
+      totalAmount,
+      installmentAmount: Math.round(totalAmount / count),
+    };
+  });
+}
