@@ -78,6 +78,17 @@ function App() {
     });
   };
 
+  // Atualiza parcelamento do item
+  const updateInstallments = (id, installments) => {
+    setCart((prevCart) => {
+      const existingIndex = prevCart.findIndex((item) => item.id === id);
+      if (existingIndex < 0) return prevCart;
+      const updated = [...prevCart];
+      updated[existingIndex] = { ...updated[existingIndex], installments };
+      return updated;
+    });
+  };
+
   // Remove item do carrinho
   const removeFromCart = (id) => {
     setCart((prevCart) => prevCart.filter((item) => item.id !== id));
@@ -124,9 +135,9 @@ function App() {
             {/* Rota detalhes do relógio - recebe função addToCart */}
             <Route path="/relogio/:id" element={<WatchDetails onAddToCart={addToCart} />} />
             {/* Rota carrinho - recebe cart e funções de gerenciamento */}
-            <Route path="/carrinho" element={<Cart cart={cart} onUpdateQuantity={updateQuantity} onRemoveItem={removeFromCart} />} />
+            <Route path="/carrinho" element={<Cart cart={cart} onUpdateQuantity={updateQuantity} onRemoveItem={removeFromCart} onUpdateInstallments={updateInstallments} />} />
             {/* Rota checkout - recebe cart e função para limpar após pedido */}
-            <Route path="/checkout" element={<Checkout cart={cart} onClearCart={clearCart} />} />
+            <Route path="/checkout" element={<Checkout cart={cart} onClearCart={clearCart} onUpdateInstallments={updateInstallments} />} />
           </Routes>
         </main>
         
