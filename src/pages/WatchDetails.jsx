@@ -40,17 +40,27 @@ function WatchDetails({ onAddToCart }) {
 
   // Estado local para feedback visual do botão "Adicionar ao Carrinho"
   const [addedFeedback, setAddedFeedback] = useState(false);
-  // Estado para mostrar/ocultar opções de parcelamento
-  const [showInstallments, setShowInstallments] = useState(false);
+  // Estado para parcelamento selecionado (null = à vista/Pix, 1-12 = cartão)
+  const [selectedInstallments, setSelectedInstallments] = useState(null);
 
   // Calcula opções de parcelamento
   const installmentOptions = calculateInstallments(watch.price);
-  const twelveInstallments = installmentOptions[11]; // 12x
+
+  // Opção selecionada atualmente
+  const selectedOption = selectedInstallments
+    ? installmentOptions.find((opt) => opt.installments === selectedInstallments)
+    : null;
+
+  // Preço a exibir (à vista ou parcelado)
+  const displayPrice = selectedOption ? selectedOption.totalAmount : watch.price;
+  const displayLabel = selectedOption
+    ? `${selectedOption.installments}x de ${formatPrice(selectedOption.installmentAmount)} no cartão`
+    : `à vista no Pix`;
 
   // Handler para "Adicionar ao Carrinho"
   const handleAddToCart = () => {
     if (!watch.inStock) return;
-    onAddToCart(watch);
+    onAddToCart(watch, selectedInstallments);
     setAddedFeedback(true);
     setTimeout(() => setAddedFeedback(false), 1500);
   };
@@ -58,34 +68,9 @@ function WatchDetails({ onAddToCart }) {
   // Handler para "Comprar Agora"
   const handleBuyNow = () => {
     if (!watch.inStock) return;
-    onAddToCart(watch);
+    onAddToCart(watch, selectedInstallments);
     navigate('/carrinho');
   };
-
-  // Relógio não encontrado
-  if (!watch) {
-    return (
-      <section className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900 px-6">
-        <div className="text-center max-w-md">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-            Relógio não encontrado
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
-            O relógio que você procura não existe ou foi removido.
-          </p>
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition-colors"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Voltar para a vitrine
-          </Link>
-        </div>
-      </section>
-    );
-  }
 
   return (
     <section className="min-h-screen bg-white dark:bg-gray-900 py-16 px-6">
@@ -165,49 +150,40 @@ function WatchDetails({ onAddToCart }) {
                 </div>
               </div>
 
-              {/* Preço */}
+              {/* Preço com dropdown de parcelamento */}
               <div className="flex items-center gap-3 border-t border-gray-200 dark:border-gray-700 pt-4">
                 <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
                   <svg className="w-6 h-6 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <div>
+                <div className="flex-1">
                   <p className="text-sm text-gray-500 dark:text-gray-400">Preço</p>
                   <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">
-                    {formatPrice(watch.price)} <span className="text-lg font-normal text-gray-600 dark:text-gray-400">à vista no Pix</span>
+                    {formatPrice(displayPrice)} <span className="text-lg font-normal text-gray-600 dark:text-gray-400">{displayLabel}</span>
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    ou {twelveInstallments.installments}x de {formatPrice(twelveInstallments.installmentAmount)} no cartão (Total: {formatPrice(twelveInstallments.totalAmount)})
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => setShowInstallments(!showInstallments)}
-                    className="mt-2 text-sm text-purple-600 dark:text-purple-400 hover:underline font-medium"
-                  >
-                    {showInstallments ? 'Ocultar parcelamento' : 'Ver opções de parcelamento'}
-                  </button>
+
+                  {/* Dropdown de parcelamento */}
+                  <div className="mt-3">
+                    <label htmlFor="installments" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Parcelamento
+                    </label>
+                    <select
+                      id="installments"
+                      value={selectedInstallments || ''}
+                      onChange={(e) => setSelectedInstallments(e.target.value ? Number(e.target.value) : null)}
+                      className="w-full max-w-xs px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
+                    >
+                      <option value="">À vista no Pix — {formatPrice(watch.price)}</option>
+                      {installmentOptions.map((opt) => (
+                        <option key={opt.installments} value={opt.installments}>
+                          {opt.installments}x de {formatPrice(opt.installmentAmount)} — Total: {formatPrice(opt.totalAmount)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
               </div>
-
-              {/* Opções de parcelamento */}
-              {showInstallments && (
-                <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 space-y-2">
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className="px-2 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded text-xs font-medium">Melhor preço</span>
-                    <span className="text-gray-600 dark:text-gray-400">À vista no Pix:</span>
-                    <span className="font-semibold text-gray-900 dark:text-white ml-auto">{formatPrice(watch.price)}</span>
-                  </div>
-                  <div className="border-t border-gray-200 dark:border-gray-700 pt-2 space-y-1">
-                    {installmentOptions.map((opt) => (
-                      <div key={opt.installments} className="flex justify-between text-sm text-gray-700 dark:text-gray-300">
-                        <span>{opt.installments}x de {formatPrice(opt.installmentAmount)}</span>
-                        <span className="font-medium text-gray-900 dark:text-white">Total: {formatPrice(opt.totalAmount)}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
 
               {/* Status de estoque */}
               <div className="flex items-center gap-3">
