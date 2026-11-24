@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { formatPrice } from '../data/watches';
+import { formatPrice, calculateInstallments } from '../data/watches';
 
 /**
  * Cart - Página do carrinho de compras
@@ -12,8 +12,18 @@ import { formatPrice } from '../data/watches';
 function Cart({ cart, onUpdateQuantity, onRemoveItem }) {
   const navigate = useNavigate();
 
+  // Calcula preço do item considerando parcelamento
+  const getItemPrice = (item) => {
+    if (item.installments) {
+      const options = calculateInstallments(item.price);
+      const opt = options.find((o) => o.installments === item.installments);
+      return opt ? opt.totalAmount : item.price;
+    }
+    return item.price;
+  };
+
   // Calcula subtotal
-  const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const subtotal = cart.reduce((sum, item) => sum + getItemPrice(item) * item.quantity, 0);
 
   // Handler para finalizar pedido - navega para checkout
   const handleCheckout = () => {
@@ -86,7 +96,12 @@ function Cart({ cart, onUpdateQuantity, onRemoveItem }) {
                     {item.caseSize}
                   </p>
                   <p className="text-lg font-bold text-gray-900 dark:text-white mt-2">
-                    {formatPrice(item.price)}
+                    {formatPrice(getItemPrice(item))}
+                    {item.installments && (
+                      <span className="ml-2 text-sm font-normal text-purple-600 dark:text-purple-400">
+                        ({item.installments}x)
+                      </span>
+                    )}
                   </p>
 
                   {/* Controles de quantidade */}
@@ -131,7 +146,7 @@ function Cart({ cart, onUpdateQuantity, onRemoveItem }) {
                 {/* Preço total do item */}
                 <div className="flex items-center">
                   <p className="text-xl font-bold text-gray-900 dark:text-white w-32 text-right">
-                    {formatPrice(item.price * item.quantity)}
+                    {formatPrice(getItemPrice(item) * item.quantity)}
                   </p>
                 </div>
               </article>
