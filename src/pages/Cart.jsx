@@ -1,4 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { formatPrice, calculateInstallments } from '../data/watches';
 
 /**
@@ -7,9 +8,10 @@ import { formatPrice, calculateInstallments } from '../data/watches';
  * @param {Array} props.cart - Array de itens no carrinho
  * @param {Function} props.onUpdateQuantity - Função para atualizar quantidade (id, amount)
  * @param {Function} props.onRemoveItem - Função para remover item (id)
+ * @param {Function} props.onUpdateInstallments - Função para atualizar parcelamento (id, installments)
  * @returns {JSX.Element} Página do carrinho
  */
-function Cart({ cart, onUpdateQuantity, onRemoveItem }) {
+function Cart({ cart, onUpdateQuantity, onRemoveItem, onUpdateInstallments }) {
   const navigate = useNavigate();
 
   // Calcula preço do item considerando parcelamento
@@ -140,6 +142,26 @@ function Cart({ cart, onUpdateQuantity, onRemoveItem }) {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                       </svg>
                     </button>
+                  </div>
+
+                  {/* Dropdown de parcelamento no carrinho */}
+                  <div className="mt-3">
+                    <label htmlFor={`installments-${item.id}`} className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Parcelamento
+                    </label>
+                    <select
+                      id={`installments-${item.id}`}
+                      value={item.installments || ''}
+                      onChange={(e) => onUpdateInstallments(item.id, e.target.value ? Number(e.target.value) : null)}
+                      className="w-full max-w-xs px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-xs text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
+                    >
+                      <option value="">À vista no Pix</option>
+                      {calculateInstallments(item.price).map((opt) => (
+                        <option key={opt.installments} value={opt.installments}>
+                          {opt.installments}x de {formatPrice(opt.installmentAmount)}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
 
