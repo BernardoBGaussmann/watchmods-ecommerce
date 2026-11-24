@@ -159,11 +159,12 @@ function WatchDetails({ onAddToCart }) {
                 </div>
                 <div className="flex-1">
                   <p className="text-sm text-gray-500 dark:text-gray-400">Preço</p>
+                  {/* Preço original sempre visível */}
                   <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">
-                    {formatPrice(displayPrice)} <span className="text-lg font-normal text-gray-600 dark:text-gray-400">{displayLabel}</span>
+                    {formatPrice(watch.price)} <span className="text-lg font-normal text-gray-600 dark:text-gray-400">à vista no Pix</span>
                   </p>
 
-                  {/* Dropdown de parcelamento */}
+                  {/* Dropdown de parcelamento - fonte menor, sem total */}
                   <div className="mt-3">
                     <label htmlFor="installments" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Parcelamento
@@ -172,15 +173,20 @@ function WatchDetails({ onAddToCart }) {
                       id="installments"
                       value={selectedInstallments || ''}
                       onChange={(e) => setSelectedInstallments(e.target.value ? Number(e.target.value) : null)}
-                      className="w-full max-w-xs px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
+                      className="w-full max-w-xs px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
                     >
-                      <option value="">À vista no Pix — {formatPrice(watch.price)}</option>
+                      <option value="">À vista no Pix</option>
                       {installmentOptions.map((opt) => (
                         <option key={opt.installments} value={opt.installments}>
-                          {opt.installments}x de {formatPrice(opt.installmentAmount)} — Total: {formatPrice(opt.totalAmount)}
+                          {opt.installments}x de {formatPrice(opt.installmentAmount)}
                         </option>
                       ))}
                     </select>
+                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                      {selectedOption
+                        ? `Total com juros: ${formatPrice(selectedOption.totalAmount)}`
+                        : 'Sem juros no Pix'}
+                    </p>
                   </div>
                 </div>
               </div>
