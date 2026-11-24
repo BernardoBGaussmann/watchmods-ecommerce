@@ -46,7 +46,7 @@ function App() {
   }, [cart]);
 
   // Adiciona relógio ao carrinho ou incrementa quantidade
-  const addToCart = (watch) => {
+  const addToCart = (watch, installments = null) => {
     setCart((prevCart) => {
       const existingIndex = prevCart.findIndex((item) => item.id === watch.id);
       if (existingIndex >= 0) {
@@ -55,8 +55,8 @@ function App() {
         updated[existingIndex] = { ...updated[existingIndex], quantity: updated[existingIndex].quantity + 1 };
         return updated;
       }
-      // Novo item: adiciona com quantity 1
-      return [...prevCart, { ...watch, quantity: 1 }];
+      // Novo item: adiciona com quantity 1 e parcelamento selecionado
+      return [...prevCart, { ...watch, quantity: 1, installments }];
     });
   };
 
