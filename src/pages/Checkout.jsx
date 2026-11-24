@@ -7,9 +7,10 @@ import { formatPrice, calculateInstallments } from '../data/watches';
  * @param {Object} props - Props do componente
  * @param {Array} props.cart - Array de itens no carrinho
  * @param {Function} props.onClearCart - Função para limpar carrinho após pedido
+ * @param {Function} props.onUpdateInstallments - Função para atualizar parcelamento (id, installments)
  * @returns {JSX.Element} Página de checkout
  */
-function Checkout({ cart, onClearCart }) {
+function Checkout({ cart, onClearCart, onUpdateInstallments }) {
   const navigate = useNavigate();
   const [orderConfirmed, setOrderConfirmed] = useState(false);
   const [isLoadingCep, setIsLoadingCep] = useState(false);
@@ -246,6 +247,25 @@ function Checkout({ cart, onClearCart }) {
                         {item.installments && <span className="ml-1 text-purple-600 dark:text-purple-400">({item.installments}x)</span>}
                       </p>
                       <p className="font-medium text-gray-900 dark:text-white">{formatPrice(getItemPrice(item) * item.quantity)}</p>
+                      {/* Dropdown de parcelamento no checkout */}
+                      <div className="mt-2">
+                        <label htmlFor={`checkout-installments-${item.id}`} className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Parcelamento
+                        </label>
+                        <select
+                          id={`checkout-installments-${item.id}`}
+                          value={item.installments || ''}
+                          onChange={(e) => onUpdateInstallments(item.id, e.target.value ? Number(e.target.value) : null)}
+                          className="w-full max-w-xs px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-xs text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
+                        >
+                          <option value="">À vista no Pix</option>
+                          {calculateInstallments(item.price).map((opt) => (
+                            <option key={opt.installments} value={opt.installments}>
+                              {opt.installments}x de {formatPrice(opt.installmentAmount)}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
                     </div>
                   </div>
                 ))}
