@@ -1,5 +1,5 @@
 // services/catalog.js
-// Lógica de catálogo (busca, validação de existência)
+// Lógica de catálogo (busca, validação de existência, controle de estoque)
 
 import { watches } from '../data/watches.js';
 
@@ -42,4 +42,14 @@ export function validateStock(itens) {
   }
 
   return { valid: errors.length === 0, errors, watchesMap };
+}
+
+/**
+ * Decrementa estoque dos itens após confirmação do pedido
+ * @param {Map} watchesMap - Mapa de itens validados { id: { watch, quantity } }
+ */
+export function decrementStock(watchesMap) {
+  for (const [id, { watch, quantity }] of watchesMap) {
+    watch.stock -= quantity;
+  }
 }
