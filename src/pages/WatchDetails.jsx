@@ -18,6 +18,8 @@ function WatchDetails({ onAddToCart }) {
   const [addedFeedback, setAddedFeedback] = useState(false);
   // Estado para parcelamento selecionado (null = à vista/Pix, 1-12 = cartão)
   const [selectedInstallments, setSelectedInstallments] = useState(null);
+  // Estado para aviso de estoque
+  const [stockWarning, setStockWarning] = useState('');
 
   // Busca relógio do backend
   useEffect(() => {
@@ -87,6 +89,8 @@ function WatchDetails({ onAddToCart }) {
   // Handler para "Adicionar ao Carrinho"
   const handleAddToCart = () => {
     if (!watch.stock || watch.stock <= 0) return;
+    // Verifica se já tem no carrinho (o carrinho é gerenciado no App)
+    // O aviso de estoque será mostrado no Cart.jsx
     onAddToCart(watch, selectedInstallments);
     setAddedFeedback(true);
     setTimeout(() => setAddedFeedback(false), 1500);
@@ -232,6 +236,12 @@ function WatchDetails({ onAddToCart }) {
                   </p>
                 </div>
               </div>
+              {/* Aviso de estoque */}
+              {stockWarning && (
+                <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg text-yellow-800 dark:text-yellow-200 text-sm">
+                  {stockWarning}
+                </div>
+              )}
             </div>
 
             {/* Botões de ação + Trust badges */}
