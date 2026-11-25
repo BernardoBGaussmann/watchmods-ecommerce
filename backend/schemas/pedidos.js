@@ -80,7 +80,28 @@ export const pedidoResponseSchema = {
         valorParcela: { type: 'integer' },
         totalComJuros: { type: 'integer' }
       }
-    }
+    },
+    cliente: {
+      type: 'object',
+      properties: {
+        nome: { type: 'string' },
+        email: { type: 'string' },
+        whatsapp: { type: 'string' }
+      }
+    },
+    endereco: {
+      type: 'object',
+      properties: {
+        cep: { type: 'string' },
+        rua: { type: 'string' },
+        numero: { type: 'string' },
+        complemento: { type: 'string' },
+        bairro: { type: 'string' },
+        cidade: { type: 'string' },
+        estado: { type: 'string' }
+      }
+    },
+    criadoEm: { type: 'string', format: 'date-time' }
   },
-  required: ['pedidoId', 'status', 'total', 'itens', 'parcelamento']
+  required: ['pedidoId', 'status', 'total', 'itens', 'parcelamento', 'cliente', 'endereco', 'criadoEm']
 };
