@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { formatPrice, calculateInstallments } from '../data/watches';
+import { formatPrice } from '../data/watches';
 
 /**
  * Cart - Página do carrinho de compras
@@ -14,17 +14,10 @@ import { formatPrice, calculateInstallments } from '../data/watches';
 function Cart({ cart, onUpdateQuantity, onRemoveItem, onUpdateInstallments }) {
   const navigate = useNavigate();
 
-  // Calcula preço do item considerando parcelamento
-  const getItemPrice = (item) => {
-    if (item.installments) {
-      const options = calculateInstallments(item.price);
-      const opt = options.find((o) => o.installments === item.installments);
-      return opt ? opt.totalAmount : item.price;
-    }
-    return item.price;
-  };
+  // Preço do item (o backend recalcula com parcelamento no checkout)
+  const getItemPrice = (item) => item.price;
 
-  // Calcula subtotal
+  // Calcula subtotal (preço base, sem juros - juros aplicados no backend)
   const subtotal = cart.reduce((sum, item) => sum + getItemPrice(item) * item.quantity, 0);
 
   // Handler para finalizar pedido - navega para checkout
@@ -144,25 +137,10 @@ function Cart({ cart, onUpdateQuantity, onRemoveItem, onUpdateInstallments }) {
                     </button>
                   </div>
 
-                  {/* Dropdown de parcelamento no carrinho */}
-                  <div className="mt-3">
-                    <label htmlFor={`installments-${item.id}`} className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Parcelamento
-                    </label>
-                    <select
-                      id={`installments-${item.id}`}
-                      value={item.installments || ''}
-                      onChange={(e) => onUpdateInstallments(item.id, e.target.value ? Number(e.target.value) : null)}
-                      className="w-full max-w-xs px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-xs text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
-                    >
-                      <option value="">À vista no Pix</option>
-                      {calculateInstallments(item.price).map((opt) => (
-                        <option key={opt.installments} value={opt.installments}>
-                          {opt.installments}x de {formatPrice(opt.installmentAmount)}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  {/* Parcelamento será selecionado no checkout (aplicado ao total do pedido) */}
+                  <p className="mt-3 text-xs text-gray-500 dark:text-gray-400">
+                    Parcelamento será escolhido no checkout (aplicado ao total)
+                  </p>
                 </div>
 
                 {/* Preço total do item */}
