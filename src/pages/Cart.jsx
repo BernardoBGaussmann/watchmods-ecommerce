@@ -13,6 +13,8 @@ import { formatPrice } from '../data/watches';
  */
 function Cart({ cart, onUpdateQuantity, onRemoveItem, onUpdateInstallments }) {
   const navigate = useNavigate();
+  // Estado para avisos de estoque por item
+  const [stockWarnings, setStockWarnings] = useState({});
 
   // Preço do item (o backend recalcula com parcelamento no checkout)
   const getItemPrice = (item) => item.price;
@@ -23,6 +25,36 @@ function Cart({ cart, onUpdateQuantity, onRemoveItem, onUpdateInstallments }) {
   // Handler para finalizar pedido - navega para checkout
   const handleCheckout = () => {
     navigate('/checkout');
+  };
+
+  // Handler para atualizar quantidade com verificação de estoque
+  const handleUpdateQuantity = (item, amount) => {
+    const newQuantity = item.quantity + amount;
+    // Verifica se o item tem estoque definido
+    if (item.stock !== undefined && item.stock !== null && newQuantity > item.stock) {
+      setStockWarnings(prev => ({
+        ...prev,
+        [item.id]: `Apenas ${item.stock} unidade${item.stock !== 1 ? 's' : ''} disponível${item.stock !== 1 ? 'eis' : ''} em estoque`
+      }));
+      // Limpa o aviso após 3 segundos
+      setTimeout(() => {
+        setStockWarnings(prev => {
+          const next = { ...prev };
+          delete next[item.id];
+          return next;
+        });
+      }, 3000);
+      return;
+    }
+    // Limpa aviso se existir
+    if (stockWarnings[item.id]) {
+      setStockWarnings(prev => {
+        const next = { ...prev };
+        delete next[item.id];
+        return next;
+      });
+    }
+    onUpdateQuantity(item.id, amount);
   };
 
   // Carrinho vazio
@@ -102,7 +134,7 @@ function Cart({ cart, onUpdateQuantity, onRemoveItem, onUpdateInstallments }) {
                   {/* Controles de quantidade */}
                   <div className="flex items-center gap-3 mt-3">
                     <button
-                      onClick={() => onUpdateQuantity(item.id, -1)}
+                      onClick={() => handleUpdateQuantity(item, -1)}
                       disabled={item.quantity <= 1}
                       className="w-10 h-10 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
                       aria-label={`Diminuir quantidade de ${item.name}`}
@@ -117,8 +149,9 @@ function Cart({ cart, onUpdateQuantity, onRemoveItem, onUpdateInstallments }) {
                     </span>
 
                     <button
-                      onClick={() => onUpdateQuantity(item.id, 1)}
-                      className="w-10 h-10 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-center"
+                      onClick={() => handleUpdateQuantity(item, 1)}
+                      disabled={item.stock !== undefined && item.stock !== null && item.quantity >= item.stock}
+                      className="w-10 h-10 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
                       aria-label={`Aumentar quantidade de ${item.name}`}
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -141,6 +174,12 @@ function Cart({ cart, onUpdateQuantity, onRemoveItem, onUpdateInstallments }) {
                   <p className="mt-3 text-xs text-gray-500 dark:text-gray-400">
                     Parcelamento será escolhido no checkout (aplicado ao total)
                   </p>
+                  {/* Aviso de estoque */}
+                  {stockWarnings[item.id] && (
+                    <p className="mt-2 text-sm text-yellow-700 dark:text-yellow-300 bg-yellow-50 dark:bg-yellow-900/20 p-2 rounded-lg">
+                      {stockWarnings[item.id]}
+                    </p>
+                  )}
                 </div>
 
                 {/* Preço total do item */}
