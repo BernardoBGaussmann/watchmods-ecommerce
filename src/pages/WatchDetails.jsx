@@ -1,20 +1,54 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
-import { watches, formatPrice, calculateInstallments } from '../data/watches';
+import { useState, useEffect } from 'react';
+import { getWatchById, formatPrice, calculateInstallments } from '../data/watches';
 
 /**
  * WatchDetails - Página de detalhes do relógio
- * Lê o ID da URL via useParams e busca o relógio no array watches
+ * Busca o relógio por ID via API do backend
  * @param {Object} props - Props do componente
  * @param {Function} props.onAddToCart - Função para adicionar item ao carrinho
  */
 function WatchDetails({ onAddToCart }) {
   const { id } = useParams();
   const navigate = useNavigate();
-  const watch = watches.find((w) => w.id === id);
+  const [watch, setWatch] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
 
-  // Relógio não encontrado - retorna cedo
-  if (!watch) {
+  // Busca relógio do backend
+  useEffect(() => {
+    async function loadWatch() {
+      try {
+        const data = await getWatchById(id);
+        if (data) {
+          setWatch(data);
+        } else {
+          setNotFound(true);
+        }
+      } catch (err) {
+        console.error('Erro ao buscar relógio:', err);
+        setNotFound(true);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadWatch();
+  }, [id]);
+
+  // Loading state
+  if (loading) {
+    return (
+      <section className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900 px-6">
+        <div className="text-center">
+          <div className="animate-spin text-purple-600 text-4xl">⟳</div>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">Carregando relógio...</p>
+        </div>
+      </section>
+    );
+  }
+
+  // Relógio não encontrado
+  if (notFound || !watch) {
     return (
       <section className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900 px-6">
         <div className="text-center max-w-md">
@@ -51,15 +85,9 @@ function WatchDetails({ onAddToCart }) {
     ? installmentOptions.find((opt) => opt.installments === selectedInstallments)
     : null;
 
-  // Preço a exibir (à vista ou parcelado)
-  const displayPrice = selectedOption ? selectedOption.totalAmount : watch.price;
-  const displayLabel = selectedOption
-    ? `${selectedOption.installments}x de ${formatPrice(selectedOption.installmentAmount)} no cartão`
-    : `à vista no Pix`;
-
   // Handler para "Adicionar ao Carrinho"
   const handleAddToCart = () => {
-    if (!watch.inStock) return;
+    if (!watch.stock || watch.stock <= 0) return;
     onAddToCart(watch, selectedInstallments);
     setAddedFeedback(true);
     setTimeout(() => setAddedFeedback(false), 1500);
@@ -67,7 +95,7 @@ function WatchDetails({ onAddToCart }) {
 
   // Handler para "Comprar Agora"
   const handleBuyNow = () => {
-    if (!watch.inStock) return;
+    if (!watch.stock || watch.stock <= 0) return;
     onAddToCart(watch, selectedInstallments);
     navigate('/carrinho');
   };
@@ -96,13 +124,13 @@ function WatchDetails({ onAddToCart }) {
               className="w-full h-full object-cover"
             />
             {/* Badge fora de estoque */}
-            {!watch.inStock && (
+            {!watch.stock || watch.stock <= 0 ? (
               <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                 <span className="px-4 py-2 bg-red-600 text-white text-lg font-semibold rounded-lg">
                   Fora de estoque
                 </span>
               </div>
-            )}
+            ) : null}
             {/* Badge destaque */}
             {watch.featured && (
               <div className="absolute top-4 left-4">
@@ -201,7 +229,7 @@ function WatchDetails({ onAddToCart }) {
                 <div>
                   <p className="text-sm text-gray-500 dark:text-gray-400">Disponibilidade</p>
                   <p className="text-xl font-semibold text-gray-900 dark:text-white">
-                    {watch.inStock ? 'Em estoque' : 'Fora de estoque'}
+                    {watch.stock && watch.stock > 0 ? `Em estoque (${watch.stock} un.)` : 'Fora de estoque'}
                   </p>
                 </div>
               </div>
@@ -213,28 +241,28 @@ function WatchDetails({ onAddToCart }) {
               <button
                 onClick={handleBuyNow}
                 className={`w-full py-4 px-6 text-lg font-semibold rounded-xl transition-all ${
-                  watch.inStock
+                  watch.stock && watch.stock > 0
                     ? 'bg-purple-600 text-white hover:bg-purple-700 focus:ring-4 focus:ring-purple-500/30'
                     : 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
                 }`}
-                disabled={!watch.inStock}
-                aria-label={watch.inStock ? `Comprar ${watch.name} agora` : `${watch.name} fora de estoque`}
+                disabled={!watch.stock || watch.stock <= 0}
+                aria-label={watch.stock && watch.stock > 0 ? `Comprar ${watch.name} agora` : `${watch.name} fora de estoque`}
               >
-                {watch.inStock ? 'Comprar Agora' : 'Indisponível'}
+                {watch.stock && watch.stock > 0 ? 'Comprar Agora' : 'Indisponível'}
               </button>
 
               {/* Botão secundário: Adicionar ao Carrinho */}
               <button
                 onClick={handleAddToCart}
                 className={`w-full py-4 px-6 text-lg font-semibold rounded-xl transition-all ${
-                  watch.inStock
+                  watch.stock && watch.stock > 0
                     ? 'border-2 border-purple-600 text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 focus:ring-4 focus:ring-purple-500/30'
                     : 'border-2 border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed'
                 }`}
-                disabled={!watch.inStock}
-                aria-label={watch.inStock ? `Adicionar ${watch.name} ao carrinho` : `${watch.name} fora de estoque`}
+                disabled={!watch.stock || watch.stock <= 0}
+                aria-label={watch.stock && watch.stock > 0 ? `Adicionar ${watch.name} ao carrinho` : `${watch.name} fora de estoque`}
               >
-                {addedFeedback ? 'Adicionado!' : watch.inStock ? 'Adicionar ao Carrinho' : 'Indisponível'}
+                {addedFeedback ? 'Adicionado!' : watch.stock && watch.stock > 0 ? 'Adicionar ao Carrinho' : 'Indisponível'}
               </button>
 
               {/* Trust badges */}
