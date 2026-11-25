@@ -1,7 +1,7 @@
 /**
  * WatchCard Component - WatchModsBR
  * Card individual de relógio para exibição em grid
- * Recebe prop `watch` com: id, name, caseSize, price, imageUrl, inStock, featured
+ * Recebe prop `watch` com: id, name, caseSize, price, imageUrl, stock (inteiro), featured
  */
 import { formatPrice } from "../data/watches";
 import { Link } from 'react-router-dom';
@@ -13,6 +13,9 @@ import { Link } from 'react-router-dom';
  * @returns {JSX.Element} Card do relógio
  */
 function WatchCard({ watch }) {
+  // Verifica estoque: stock > 0 significa disponível
+  const inStock = watch.stock && watch.stock > 0;
+
   return (
     <Link to={`/relogio/${watch.id}`} className="block">
       <article className="group bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-300 hover:shadow-lg">
@@ -25,7 +28,7 @@ function WatchCard({ watch }) {
           loading="lazy"
         />
         {/* Badge fora de estoque */}
-        {!watch.inStock && (
+        {!inStock && (
           <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
             <span className="px-3 py-1 bg-red-600 text-white text-sm font-semibold rounded-lg">
               Fora de estoque
