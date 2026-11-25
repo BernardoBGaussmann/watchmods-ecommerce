@@ -46,6 +46,7 @@ function App() {
   }, [cart]);
 
   // Adiciona relógio ao carrinho ou incrementa quantidade
+  // Armazena apenas id, quantity e installments (backend recalcula preços)
   const addToCart = (watch, installments = null) => {
     setCart((prevCart) => {
       const existingIndex = prevCart.findIndex((item) => item.id === watch.id);
@@ -56,7 +57,7 @@ function App() {
         return updated;
       }
       // Novo item: adiciona com quantity 1 e parcelamento selecionado
-      return [...prevCart, { ...watch, quantity: 1, installments }];
+      return [...prevCart, { id: watch.id, name: watch.name, price: watch.price, imageUrl: watch.imageUrl, caseSize: watch.caseSize, quantity: 1, installments }];
     });
   };
 
@@ -137,7 +138,7 @@ function App() {
             {/* Rota carrinho - recebe cart e funções de gerenciamento */}
             <Route path="/carrinho" element={<Cart cart={cart} onUpdateQuantity={updateQuantity} onRemoveItem={removeFromCart} onUpdateInstallments={updateInstallments} />} />
             {/* Rota checkout - recebe cart e função para limpar após pedido */}
-            <Route path="/checkout" element={<Checkout cart={cart} onClearCart={clearCart} onUpdateInstallments={updateInstallments} />} />
+            <Route path="/checkout" element={<Checkout cart={cart} onClearCart={clearCart} />} />
           </Routes>
         </main>
         
