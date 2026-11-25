@@ -1,26 +1,30 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { formatPrice, calculateInstallments } from '../data/watches';
+import { formatPrice } from '../data/watches';
+import { createOrder } from '../api.js';
 
 /**
  * Checkout - Página de finalização de pedido
+ * Envia pedido para o backend via POST /pedidos
  * @param {Object} props - Props do componente
  * @param {Array} props.cart - Array de itens no carrinho
  * @param {Function} props.onClearCart - Função para limpar carrinho após pedido
- * @param {Function} props.onUpdateInstallments - Função para atualizar parcelamento (id, installments)
  * @returns {JSX.Element} Página de checkout
  */
-function Checkout({ cart, onClearCart, onUpdateInstallments }) {
+function Checkout({ cart, onClearCart }) {
   const navigate = useNavigate();
   const [orderConfirmed, setOrderConfirmed] = useState(false);
   const [isLoadingCep, setIsLoadingCep] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
 
   // Estado único do formulário
   const [formData, setFormData] = useState({
     fullName: '', email: '', whatsapp: '',
     cep: '', street: '', number: '', complement: '',
     neighborhood: '', city: '', state: '',
-    paymentMethod: 'pix'
+    paymentMethod: 'pix',
+    parcelas: 1
   });
 
   const [errors, setErrors] = useState({});
@@ -30,17 +34,10 @@ function Checkout({ cart, onClearCart, onUpdateInstallments }) {
   const errorClass = 'border-red-500';
   const normalClass = 'border-gray-300 dark:border-gray-600';
 
-  // Calcula preço do item considerando parcelamento
-  const getItemPrice = (item) => {
-    if (item.installments) {
-      const options = calculateInstallments(item.price);
-      const opt = options.find((o) => o.installments === item.installments);
-      return opt ? opt.totalAmount : item.price;
-    }
-    return item.price;
-  };
+  // Preço base do item (sem juros - backend recalcula)
+  const getItemPrice = (item) => item.price;
 
-  const total = cart.reduce((sum, item) => sum + getItemPrice(item) * item.quantity, 0);
+  const subtotal = cart.reduce((sum, item) => sum + getItemPrice(item) * item.quantity, 0);
 
   // Busca CEP via ViaCEP
   const fetchCep = async (cepValue) => {
@@ -89,15 +86,59 @@ function Checkout({ cart, onClearCart, onUpdateInstallments }) {
     if (!formData.neighborhood.trim()) newErrors.neighborhood = 'Bairro é obrigatório';
     if (!formData.city.trim()) newErrors.city = 'Cidade é obrigatória';
     if (!formData.state.trim()) newErrors.state = 'Estado é obrigatório';
+    if (formData.paymentMethod === 'credito' && (!formData.parcelas || formData.parcelas < 1)) {
+      newErrors.parcelas = 'Selecione o número de parcelas';
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
-    onClearCart();
-    setOrderConfirmed(true);
+
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      // Monta payload para o backend
+      const payload = {
+        itens: cart.map(item => ({
+          id: item.id,
+          quantity: item.quantity
+        })),
+        cliente: {
+          nome: formData.fullName,
+          email: formData.email,
+          whatsapp: formData.whatsapp
+        },
+        endereco: {
+          cep: formData.cep,
+          rua: formData.street,
+          numero: formData.number,
+          complemento: formData.complement,
+          bairro: formData.neighborhood,
+          cidade: formData.city,
+          estado: formData.state
+        },
+        pagamento: {
+          metodo: formData.paymentMethod,
+          parcelas: formData.paymentMethod === 'credito' ? formData.parcelas : 1
+        }
+      };
+
+      const result = await createOrder(payload);
+      
+      // Sucesso - limpa carrinho e mostra confirmação
+      onClearCart();
+      setOrderConfirmed(true);
+      // Armazena dados do pedido para a tela de confirmação
+      setFormData(prev => ({ ...prev, ...result }));
+    } catch (err) {
+      setSubmitError(err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Carrinho vazio
@@ -116,12 +157,23 @@ function Checkout({ cart, onClearCart, onUpdateInstallments }) {
 
   // Confirmação
   if (orderConfirmed) {
+    const pedidoId = formData.pedidoId || 'N/A';
+    const totalComJuros = formData.total || subtotal;
+    const parcelamento = formData.parcelamento || null;
+    
     return (
       <section className="min-h-screen bg-white dark:bg-gray-900 py-16 px-6 flex items-center justify-center">
         <div className="text-center max-w-md">
           <div className="w-20 h-20 mx-auto bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-6 text-4xl">✓</div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Pedido Confirmado!</h1>
           <p className="text-gray-600 dark:text-gray-400 mb-2">Obrigado, <strong>{formData.fullName}</strong>! Seu pedido foi realizado.</p>
+          <p className="text-gray-600 dark:text-gray-400 mb-2">Número do pedido: <strong>{pedidoId}</strong></p>
+          <p className="text-gray-600 dark:text-gray-400 mb-2">Total: <strong>{formatPrice(totalComJuros)}</strong></p>
+          {parcelamento && parcelamento.metodo === 'credito' && (
+            <p className="text-gray-600 dark:text-gray-400 mb-2">
+              {parcelamento.parcelas}x de {formatPrice(parcelamento.valorParcela)} no cartão
+            </p>
+          )}
           <p className="text-gray-600 dark:text-gray-400 mb-8">Confirmação enviada para <strong>{formData.email}</strong>.</p>
           <Link to="/" className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700">← Voltar para a loja</Link>
         </div>
@@ -225,6 +277,29 @@ function Checkout({ cart, onClearCart, onUpdateInstallments }) {
                   </label>
                 ))}
               </div>
+
+              {/* Parcelas - só aparece se cartão de crédito */}
+              {formData.paymentMethod === 'credito' && (
+                <div className="mt-4">
+                  <label htmlFor="parcelas" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Número de Parcelas <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    id="parcelas"
+                    name="parcelas"
+                    value={formData.parcelas}
+                    onChange={handleChange}
+                    className={`${inputClass} ${errors.parcelas ? errorClass : normalClass}`}
+                    aria-invalid={errors.parcelas ? 'true' : 'false'}
+                  >
+                    <option value="">Selecione</option>
+                    {[1,2,3,4,5,6,7,8,9,10,11,12].map(n => (
+                      <option key={n} value={n}>{n}x</option>
+                    ))}
+                  </select>
+                  {errors.parcelas && <p className="mt-1 text-sm text-red-500" role="alert">{errors.parcelas}</p>}
+                </div>
+              )}
             </fieldset>
 
             <button type="submit" className="w-full py-4 bg-purple-600 text-white font-semibold rounded-xl hover:bg-purple-700 transition-colors text-lg">
@@ -243,45 +318,30 @@ function Checkout({ cart, onClearCart, onUpdateInstallments }) {
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-gray-900 dark:text-white truncate">{item.name}</p>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Qtd: {item.quantity} × {formatPrice(getItemPrice(item))}
-                        {item.installments && <span className="ml-1 text-purple-600 dark:text-purple-400">({item.installments}x)</span>}
+                        Qtd: {item.quantity} × {formatPrice(item.price)}
                       </p>
-                      <p className="font-medium text-gray-900 dark:text-white">{formatPrice(getItemPrice(item) * item.quantity)}</p>
-                      {/* Dropdown de parcelamento no checkout */}
-                      <div className="mt-2">
-                        <label htmlFor={`checkout-installments-${item.id}`} className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                          Parcelamento
-                        </label>
-                        <select
-                          id={`checkout-installments-${item.id}`}
-                          value={item.installments || ''}
-                          onChange={(e) => onUpdateInstallments(item.id, e.target.value ? Number(e.target.value) : null)}
-                          className="w-full max-w-xs px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-xs text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
-                        >
-                          <option value="">À vista no Pix</option>
-                          {calculateInstallments(item.price).map((opt) => (
-                            <option key={opt.installments} value={opt.installments}>
-                              {opt.installments}x de {formatPrice(opt.installmentAmount)}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
+                      <p className="font-medium text-gray-900 dark:text-white">{formatPrice(item.price * item.quantity)}</p>
                     </div>
                   </div>
                 ))}
               </div>
               <div className="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-2">
                 <div className="flex justify-between text-gray-600 dark:text-gray-400">
-                  <span>Subtotal</span>
-                  <span>{formatPrice(total)}</span>
+                  <span>Subtotal ({cart.reduce((sum, item) => sum + item.quantity, 0)} itens)</span>
+                  <span>{formatPrice(subtotal)}</span>
                 </div>
                 <div className="flex justify-between text-gray-600 dark:text-gray-400">
                   <span>Frete</span>
                   <span className="text-green-600">Grátis</span>
                 </div>
+                {formData.paymentMethod === 'credito' && formData.parcelas > 1 && (
+                  <div className="text-sm text-purple-600 dark:text-purple-400">
+                    {formData.parcelas}x no cartão (juros aplicados no total final)
+                  </div>
+                )}
                 <div className="flex justify-between text-xl font-bold text-gray-900 dark:text-white border-t border-gray-200 dark:border-gray-700 pt-2">
                   <span>Total</span>
-                  <span>{formatPrice(total)}</span>
+                  <span>{formatPrice(subtotal)}</span>
                 </div>
               </div>
             </div>
