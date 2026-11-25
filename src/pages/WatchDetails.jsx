@@ -14,6 +14,10 @@ function WatchDetails({ onAddToCart }) {
   const [watch, setWatch] = useState(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  // Estado local para feedback visual do botão "Adicionar ao Carrinho"
+  const [addedFeedback, setAddedFeedback] = useState(false);
+  // Estado para parcelamento selecionado (null = à vista/Pix, 1-12 = cartão)
+  const [selectedInstallments, setSelectedInstallments] = useState(null);
 
   // Busca relógio do backend
   useEffect(() => {
@@ -71,11 +75,6 @@ function WatchDetails({ onAddToCart }) {
       </section>
     );
   }
-
-  // Estado local para feedback visual do botão "Adicionar ao Carrinho"
-  const [addedFeedback, setAddedFeedback] = useState(false);
-  // Estado para parcelamento selecionado (null = à vista/Pix, 1-12 = cartão)
-  const [selectedInstallments, setSelectedInstallments] = useState(null);
 
   // Calcula opções de parcelamento
   const installmentOptions = calculateInstallments(watch.price);
