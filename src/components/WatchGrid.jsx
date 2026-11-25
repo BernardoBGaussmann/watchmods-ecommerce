@@ -1,14 +1,43 @@
-import { watches } from '../data/watches';
+import { useState, useEffect } from 'react';
+import { getWatches } from '../data/watches';
 import WatchCard from './WatchCard';
 import { Link } from 'react-router-dom';
 
 /**
  * WatchGrid - Grid de relógios em destaque (home page)
- * Mostra apenas 4 relógios fixos + botão para ver todos
+ * Busca catálogo do backend e mostra 4 relógios fixos + botão para ver todos
  */
 function WatchGrid() {
+  const [watches, setWatches] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadWatches() {
+      try {
+        const data = await getWatches();
+        setWatches(data);
+      } catch (err) {
+        console.error('Erro ao buscar relógios:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadWatches();
+  }, []);
+
   // Limita a 4 relógios para a vitrine da home
   const featuredWatches = watches.slice(0, 4);
+
+  if (loading) {
+    return (
+      <section id="relogios" className="py-16 px-6 bg-white dark:bg-gray-900">
+        <div className="max-w-7xl mx-auto text-center">
+          <div className="animate-spin text-purple-600 text-4xl">⟳</div>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">Carregando relógios...</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="relogios" className="py-16 px-6 bg-white dark:bg-gray-900">
