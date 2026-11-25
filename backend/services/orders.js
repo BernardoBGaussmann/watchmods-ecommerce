@@ -1,8 +1,8 @@
 // services/orders.js
-// Lógica de criação de pedido (validação + cálculo de totais)
+// Lógica de criação de pedido (validação + cálculo de totais + baixa de estoque)
 
 import { calculateInstallments, calculateTotalWithInstallments, calculateInstallmentAmount } from '../utils/installments.js';
-import { validateStock } from './catalog.js';
+import { validateStock, decrementStock } from './catalog.js';
 
 /**
  * Cria um pedido válido a partir do payload
@@ -45,6 +45,9 @@ export function createOrder(payload) {
 
   // 4. Gera ID do pedido (timestamp + random)
   const pedidoId = `PED-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+
+  // 5. Dá baixa no estoque
+  decrementStock(watchesMap);
 
   return {
     success: true,
