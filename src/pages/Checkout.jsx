@@ -191,6 +191,14 @@ function Checkout({ cart, onClearCart }) {
           {/* Formulário */}
           <form onSubmit={handleSubmit} className="lg:col-span-2 space-y-8">
             {/* Dados Pessoais */}
+            {/* Erro de submissão (ex: estoque insuficiente) */}
+            {submitError && (
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 mb-6" role="alert">
+                <p className="text-red-700 dark:text-red-300 font-medium">{submitError}</p>
+              </div>
+            )}
+
+            {/* Dados Pessoais */}
             <fieldset className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
               <legend className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Dados Pessoais</legend>
               <div className="grid sm:grid-cols-2 gap-6">
