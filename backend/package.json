@@ -1,0 +1,16 @@
+{
+  "name": "watchmodsbr-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Backend do e-commerce WatchModsBR - Fastify + ES Modules",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "fastify": "^4.28.1",
+    "@fastify/cors": "^9.0.1"
+  },
+  "engines": { "node": ">=20.0.0" }
+}
