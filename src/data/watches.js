@@ -1,67 +1,28 @@
 /**
  * Data Module - WatchModsBR
- * Array de relógios para integração futura com API/backend
+ * Funções para buscar catálogo do backend
+ * O backend é a fonte da verdade para preços, estoque e parcelamento
  */
 
-// Placeholder SVG limpo (base64) - quadrado cinza neutro
-const placeholderImage = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MDAgNDAwIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0iI2U1ZTRlNyIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic3lzdGVtLXVpIiBmb250LXNpemU9IjE4IiBmaWxsPSIjOWNhM2FmIj5XYXRjaE1vZHNCUjwvdGV4dD48L3N2Zz4=';
+import { fetchWatches } from '../api.js';
 
-export const watches = [
-  {
-    id: '550e8400-e29b-41d4-a716-446655440001',
-    name: 'Submariner Custom',
-    caseSize: '42mm',
-    price: 12500,
-    imageUrl: placeholderImage,
-    inStock: true,
-    featured: true
-  },
-  {
-    id: '550e8400-e29b-41d4-a716-446655440002',
-    name: 'GMT Master II Mod',
-    caseSize: '40mm',
-    price: 14800,
-    imageUrl: placeholderImage,
-    inStock: true,
-    featured: true
-  },
-  {
-    id: '550e8400-e29b-41d4-a716-446655440003',
-    name: 'Daytona Ceramic',
-    caseSize: '41mm',
-    price: 18900,
-    imageUrl: placeholderImage,
-    inStock: false,
-    featured: true
-  },
-   {
-    id: '550e8400-e29b-41d4-a716-446655440004',
-    name: 'Daytona Ceramic',
-    caseSize: '41mm',
-    price: 18900,
-    imageUrl: placeholderImage,
-    inStock: false,
-    featured: true
-  },
-  {
-    id: '550e8400-e29b-41d4-a716-446655440005',
-    name: 'Daytona Ceramic',
-    caseSize: '41mm',
-    price: 18900,
-    imageUrl: placeholderImage,
-    inStock: false,
-    featured: true
-  },
-  {
-    id: '550e8400-e29b-41d4-a716-446655440006',
-    name: 'Daytona Ceramic',
-    caseSize: '41mm',
-    price: 18900,
-    imageUrl: placeholderImage,
-    inStock: false,
-    featured: true
-  }
-];
+/**
+ * Busca catálogo do backend
+ * @returns {Promise<Array>} Lista de relógios com price em centavos, stock, etc.
+ */
+export async function getWatches() {
+  return fetchWatches();
+}
+
+/**
+ * Busca um relógio específico por ID
+ * @param {string} id
+ * @returns {Promise<Object|null>} Relógio ou null
+ */
+export async function getWatchById(id) {
+  const watches = await getWatches();
+  return watches.find(w => w.id === id) || null;
+}
 
 /**
  * Formata preço de centavos para string BRL
@@ -76,8 +37,8 @@ export function formatPrice(price) {
 }
 
 /**
- * Tabela fixa de taxas de parcelamento
- * Percentual total de acréscimo sobre o valor Pix para cada número de parcelas
+ * Tabela fixa de taxas de parcelamento (apenas para exibição no frontend)
+ * O backend é a fonte da verdade para cálculo real no checkout
  */
 export const INSTALLMENT_RATES = {
   1: 3.16,
@@ -95,8 +56,8 @@ export const INSTALLMENT_RATES = {
 };
 
 /**
- * Calcula as 12 opções de parcelamento para um preço base
- * @param {number} pixPrice - Preço base (Pix) do produto
+ * Calcula as 12 opções de parcelamento para um preço base (apenas exibição)
+ * @param {number} pixPrice - Preço base (Pix) do produto em centavos
  * @returns {Array<{installments: number, totalAmount: number, installmentAmount: number}>}
  *   Array de 1x a 12x com total e valor de cada parcela
  */
