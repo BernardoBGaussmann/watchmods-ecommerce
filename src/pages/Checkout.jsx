@@ -261,7 +261,7 @@ function Checkout({ cart, onClearCart }) {
             <fieldset className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
               <legend className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Forma de Pagamento</legend>
               <div className="grid sm:grid-cols-2 gap-4">
-                {['pix', 'credit'].map(method => (
+                {['pix', 'credito'].map(method => (
                   <label key={method} className={`relative cursor-pointer p-4 rounded-xl border-2 transition-colors ${formData.paymentMethod === method ? 'border-purple-600 bg-purple-50 dark:bg-purple-900/20' : 'border-gray-200 dark:border-gray-700 hover:border-purple-300'}`}>
                     <input type="radio" name="paymentMethod" value={method} checked={formData.paymentMethod === method} onChange={handleChange} className="sr-only" />
                     <div className="flex items-center gap-4">
